@@ -3,8 +3,7 @@ dist
 .DS_Store
 
 # Hemligheter och lokal konfiguration – aldrig i repot
-.env
-.env.local
 
 # Rättningens arbetsfiler
 grading/.tmp/
+config.bat
