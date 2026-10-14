@@ -11,6 +11,10 @@ try {
 } catch {
   // ingen .env – helt normalt i CI och i en container
 }
+if (!process.env.JWT_SECRET || process.env.JWT_SECRET.trim() === "") {
+  console.error("FATAL ERROR: JWT_SECRET is not defined.")
+  process.exit(1) // Krascha servern omedelbart
+}
 
 // ---------------------------------------------------------------------------
 // Konfiguration
@@ -122,17 +126,15 @@ const requireLogin = (req, res, next) => {
 app.get('/api/user', requireLogin, (req, res) => res.json(publicMember(req.member)))
 
 // Bokningar för en medlem. memberNo i adressen gör att receptionen kan slå upp andra sen.
+// Bokningar för en medlem. Hämtas säkert från token för att förhindra IDOR-hål.
 app.get('/api/bookings', requireLogin, (req, res) => {
-  const memberNo = req.query.memberNo || req.member.memberNo
+  if (!req.member || !req.member.memberNo) {
+    return res.status(401).json({ error: 'Inloggning krävs' })
+  }
+
+  // Ta alltid medlemsnumret från den verifierade tokenen, ALDRIG från req.query
+  const memberNo = req.member.memberNo
   res.json(bookingsByMember[memberNo] || [])
-})
-
-app.get('/api/bookings/history', requireLogin, (req, res) => {
-  res.json(historyByMember[req.member.memberNo])
-})
-
-app.get('/api/messages', requireLogin, (req, res) => {
-  res.json(messagesByMember[req.member.memberNo] || [])
 })
 
 // Bokning: skapar ett bekräftelsemeddelande. Fälten lagras som TEXT och skickas som text –
