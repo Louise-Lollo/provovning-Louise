@@ -2,10 +2,10 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 
 import LoginView from '../views/LoginView.vue'
-import DashboardView from '../views/DashboardView.vue'
-import BookingsView from '../views/BookingsView.vue'
-import BookView from '../views/BookView.vue'
-import MessagesView from '../views/MessagesView.vue'
+const DashboardView = () => import ('../views/DashboardView.vue');
+const BookingsView = () => import ('../views/BookingsView.vue');
+const BookView = () => import ('../views/BookView.vue');
+const MessagesView =() => import ('../views/MessagesView.vue'); 
 
 const router = createRouter({
   history: createWebHistory(),
